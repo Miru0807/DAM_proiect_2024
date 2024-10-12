@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Tema2</string>
+
+    <!-- Adăugăm array-ul de categorii de rețete -->
+    <string-array name="recipe_categories">
+        <item>Main Course</item>
+        <item>Dessert</item>
+        <item>Appetizer</item>
+        <item>Salad</item>
+        <item>Drink</item>
+    </string-array>
+</resources>
