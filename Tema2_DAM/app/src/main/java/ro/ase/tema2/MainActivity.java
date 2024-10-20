@@ -10,9 +10,18 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.Toast;
+
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import com.google.android.material.navigation.NavigationView;
+import androidx.appcompat.widget.Toolbar;
+
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
     private Button addRecipeButton;
     private ArrayList<String> recipesList;
     private ArrayAdapter<String> adapter;
+
+    private DrawerLayout drawerLayout;
+
 
     private ImageView recipeImageView;
     private CheckBox vegetarianCheckBox;
@@ -55,11 +67,34 @@ public class MainActivity extends AppCompatActivity {
             }
     );
 
+
+
+    private void filterRecipes() {
+        ArrayList<String> filteredRecipes = new ArrayList<>();
+
+        for (String recipe : recipesList) {
+            if (filterVegetarian && !recipe.contains("Vegetarian: true")) {
+                continue;
+            }
+            if (filterEasy && recipe.contains("Difficulty: Hard")) {
+                continue;
+            }
+            if (recipe.contains("Difficulty: " + currentDifficulty)) {
+                filteredRecipes.add(recipe);
+            }
+        }
+
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, filteredRecipes);
+        recipesListView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Inițializarea elementelor UI existente
         recipesListView = findViewById(R.id.recipesListView);
         addRecipeButton = findViewById(R.id.addRecipeButton);
         recipeImageView = findViewById(R.id.recipeImageView);
@@ -67,10 +102,51 @@ public class MainActivity extends AppCompatActivity {
         easyRadioButton = findViewById(R.id.easyRadioButton);
         difficultySeekBar = findViewById(R.id.difficultySeekBar);
 
+        // Inițializează NavigationView
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        drawerLayout = findViewById(R.id.drawer_layout);
+
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+
         recipesList = new ArrayList<>();
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, recipesList);
         recipesListView.setAdapter(adapter);
 
+
+        // Setare listener pentru NavigationView
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_retete_principale) {
+                startActivity(new Intent(MainActivity.this, RetetePrincipaleActivity.class));
+            } else if (id == R.id.nav_deserturi) {
+                startActivity(new Intent(MainActivity.this, DeserturiActivity.class));
+            } else if (id == R.id.nav_aperitive) {
+                startActivity(new Intent(MainActivity.this, AperitiveActivity.class));
+            } else if (id == R.id.nav_bauturi) {
+                startActivity(new Intent(MainActivity.this, BauturiActivity.class));
+            } else if (id == R.id.nav_salate) {
+                startActivity(new Intent(MainActivity.this, SalateActivity.class));
+            } else if (id == R.id.nav_retete_vegetariene) {
+                startActivity(new Intent(MainActivity.this, ReteteVegetarieneActivity.class));
+            } else if (id == R.id.nav_retete_rapide) {
+                startActivity(new Intent(MainActivity.this, ReteteRapideActivity.class));
+            }
+
+            // Închide drawer-ul după selecție
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
+        });
+
+
+        // Restul logicii tale pentru gestionarea rețetelor
         addRecipeButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, AddRecipeActivity.class);
             startForResult.launch(intent);
@@ -121,23 +197,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void filterRecipes() {
-        ArrayList<String> filteredRecipes = new ArrayList<>();
-
-        for (String recipe : recipesList) {
-            if (filterVegetarian && !recipe.contains("Vegetarian: true")) {
-                continue;
-            }
-            if (filterEasy && recipe.contains("Difficulty: Hard")) {
-                continue;
-            }
-            if (recipe.contains("Difficulty: " + currentDifficulty)) {
-                filteredRecipes.add(recipe);
-            }
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
-
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, filteredRecipes);
-        recipesListView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
     }
+
+
 }

@@ -1,0 +1,23 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_retete_principale"
+        android:title="Rețete principale" />
+    <item
+        android:id="@+id/nav_deserturi"
+        android:title="Deserturi" />
+    <item
+        android:id="@+id/nav_aperitive"
+        android:title="Aperitive și Gustări" />
+    <item
+        android:id="@+id/nav_bauturi"
+        android:title="Băuturi și Smoothie-uri" />
+    <item
+        android:id="@+id/nav_salate"
+        android:title="Salate și Garnituri" />
+    <item
+        android:id="@+id/nav_retete_vegetariene"
+        android:title="Rețete Vegetariene" />
+    <item
+        android:id="@+id/nav_retete_rapide"
+        android:title="Rețete Rapide" />
+</menu>

@@ -9,4 +9,7 @@
         <item>Salad</item>
         <item>Drink</item>
     </string-array>
+    <string name="navigation_drawer_open">Open drawer</string>
+    <string name="navigation_drawer_close">Close drawer</string>
+
 </resources>
