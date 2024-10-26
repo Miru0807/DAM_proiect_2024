@@ -6,86 +6,80 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
-
 public class BauturiActivity extends AppCompatActivity {
     private ListView lvBauturi;
     private Button btnBackToMain;
-    private ArrayList<String> bauturiList;
+    private Button btnAddRecipe;
+    private ArrayList<Recipe> bauturiList;
     private ArrayAdapter<String> adapter;
+
+    private static final int REQUEST_CODE_ADD_RECIPE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bauturi);
 
-        // Inițializarea elementelor UI
         lvBauturi = findViewById(R.id.lvBauturi);
         btnBackToMain = findViewById(R.id.btnBackToMain);
+        btnAddRecipe = findViewById(R.id.btnAddRecipe); // Inițializare buton de adăugare
 
-        // Popularea ListView cu băuturi și smoothie-uri
         bauturiList = new ArrayList<>();
-        bauturiList.add("Băutură 1 - Limonadă");
-        bauturiList.add("Băutură 2 - Smoothie cu banane");
-        bauturiList.add("Băutură 3 - Ceai verde");
-        bauturiList.add("Băutură 4 - Frappé");
-        bauturiList.add("Băutură 5 - Smoothie cu fructe de pădure");
+        bauturiList.add(new Recipe("Băutură 1 - Limonadă", "Lămâi, Apă, Zahăr, Mentă", "1. Stoarce lămâile...\n2. Amestecă apa cu zahărul și menta..."));
+        bauturiList.add(new Recipe("Băutură 2 - Smoothie cu banane", "Banane, Lapte, Miere", "1. Amestecă bananele cu laptele...\n2. Adaugă mierea..."));
 
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, bauturiList);
+        ArrayList<String> recipeNames = new ArrayList<>();
+        for (Recipe recipe : bauturiList) {
+            recipeNames.add(recipe.getName());
+        }
+
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, recipeNames);
         lvBauturi.setAdapter(adapter);
 
-        // Setează listener pentru butonul "Back"
         btnBackToMain.setOnClickListener(v -> {
             Intent intent = new Intent(BauturiActivity.this, MainActivity.class);
             startActivity(intent);
-            finish(); // Opțional, pentru a închide activitatea curentă
+            finish();
         });
 
-        // Setează listener pentru elementele din ListView
+        // Deschide `AddRecipeDetailsActivity` pentru a adăuga o băutură nouă
+        btnAddRecipe.setOnClickListener(v -> {
+            Intent intent = new Intent(BauturiActivity.this, AddRecipeDetailsActivity.class);
+            startActivityForResult(intent, REQUEST_CODE_ADD_RECIPE);
+        });
+
+        // Deschide `MainRecipeDetailsActivity` pentru detaliile rețetei selectate
         lvBauturi.setOnItemClickListener((parent, view, position, id) -> {
+            Recipe selectedRecipe = bauturiList.get(position);
             Intent intent = new Intent(BauturiActivity.this, MainRecipeDetailsActivity.class);
-
-            String recipeName = bauturiList.get(position);
-            String ingredients = "";
-            String instructions = "";
-
-            // Setează ingredientele și instrucțiunile pentru fiecare băutură și smoothie
-            switch (position) {
-                case 0:
-                    ingredients = "Lămâi, Apă, Zahăr, Mentă";
-                    instructions = "1. Stoarce lămâile...\n2. Amestecă apa cu zahărul și menta...";
-                    break;
-                case 1:
-                    ingredients = "Banane, Lapte, Miere";
-                    instructions = "1. Amestecă bananele cu laptele...\n2. Adaugă mierea...";
-                    break;
-                case 2:
-                    ingredients = "Ceai verde, Miere, Lămâie";
-                    instructions = "1. Fierbe apa...\n2. Adaugă ceaiul verde și mierea...";
-                    break;
-                case 3:
-                    ingredients = "Cafea, Lapte, Gheață";
-                    instructions = "1. Amestecă cafeaua cu laptele...\n2. Adaugă gheața...";
-                    break;
-                case 4:
-                    ingredients = "Fructe de pădure, Iaurt, Miere";
-                    instructions = "1. Amestecă fructele de pădure cu iaurtul...\n2. Adaugă mierea...";
-                    break;
-            }
-
-            // Adaugă datele în intent
-            intent.putExtra("recipeName", recipeName);
-            intent.putExtra("ingredients", ingredients);
-            intent.putExtra("instructions", instructions);
-
-            // Adaugă activitatea sursă în intent
-            intent.putExtra("sourceActivity", "BauturiActivity");
-
-            // Pornește activitatea pentru detalii
+            intent.putExtra("recipeName", selectedRecipe.getName());
+            intent.putExtra("ingredients", selectedRecipe.getIngredients());
+            intent.putExtra("instructions", selectedRecipe.getInstructions());
             startActivity(intent);
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_ADD_RECIPE && resultCode == RESULT_OK && data != null) {
+            String newRecipeName = data.getStringExtra("recipeName");
+            String newIngredients = data.getStringExtra("ingredients");
+            String newInstructions = data.getStringExtra("instructions");
+
+            // Creează și adaugă rețeta nouă în listă
+            Recipe newRecipe = new Recipe(newRecipeName, newIngredients, newInstructions);
+            bauturiList.add(newRecipe);
+
+            // Actualizează lista afișată în `ListView`
+            adapter.add(newRecipe.getName());
+            adapter.notifyDataSetChanged();
+        }
     }
 }

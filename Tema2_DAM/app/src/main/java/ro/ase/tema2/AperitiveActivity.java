@@ -15,7 +15,7 @@ public class AperitiveActivity extends AppCompatActivity {
     private ListView lvAperitive;
     private Button btnBackToMain;
     private Button btnAddRecipe;
-    private ArrayList<String> aperitiveList;
+    private ArrayList<Recipe> aperitiveList;
     private ArrayAdapter<String> adapter;
 
     private static final int REQUEST_CODE_ADD_RECIPE = 1;
@@ -30,13 +30,16 @@ public class AperitiveActivity extends AppCompatActivity {
         btnAddRecipe = findViewById(R.id.btnAddRecipe);
 
         aperitiveList = new ArrayList<>();
-        aperitiveList.add("Aperitiv 1 - Bruschette");
-        aperitiveList.add("Aperitiv 2 - Ouă umplute");
-        aperitiveList.add("Aperitiv 3 - Salată de vinete");
-        aperitiveList.add("Aperitiv 4 - Rulouri cu șuncă");
-        aperitiveList.add("Aperitiv 5 - Platou de brânzeturi");
+        aperitiveList.add(new Recipe("Aperitiv 1 - Bruschette", "Pâine, Roșii, Ulei de măsline, Busuioc", "1. Taie roșiile...\n2. Pregătește pâinea..."));
+        aperitiveList.add(new Recipe("Aperitiv 2 - Ouă umplute", "Ouă, Maioneză, Muștar", "1. Fierbe ouăle...\n2. Umple ouăle cu amestecul..."));
 
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, aperitiveList);
+        // Adapter doar pentru numele rețetelor
+        ArrayList<String> recipeNames = new ArrayList<>();
+        for (Recipe recipe : aperitiveList) {
+            recipeNames.add(recipe.getName());
+        }
+
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, recipeNames);
         lvAperitive.setAdapter(adapter);
 
         btnBackToMain.setOnClickListener(v -> {
@@ -51,44 +54,11 @@ public class AperitiveActivity extends AppCompatActivity {
         });
 
         lvAperitive.setOnItemClickListener((parent, view, position, id) -> {
+            Recipe selectedRecipe = aperitiveList.get(position);
             Intent intent = new Intent(AperitiveActivity.this, MainRecipeDetailsActivity.class);
-
-            String recipeName = aperitiveList.get(position);
-            String ingredients = "";
-            String instructions = "";
-
-            // Setează ingredientele și instrucțiunile pentru fiecare aperitiv
-            switch (position) {
-                case 0:
-                    ingredients = "Pâine, Roșii, Ulei de măsline, Busuioc";
-                    instructions = "1. Taie roșiile...\n2. Pregătește pâinea...";
-                    break;
-                case 1:
-                    ingredients = "Ouă, Maioneză, Muștar";
-                    instructions = "1. Fierbe ouăle...\n2. Umple ouăle cu amestecul...";
-                    break;
-                case 2:
-                    ingredients = "Vinete, Ceapă, Ulei";
-                    instructions = "1. Coace vinetele...\n2. Amestecă cu ceapă...";
-                    break;
-                case 3:
-                    ingredients = "Șuncă, Cremă de brânză, Castraveți";
-                    instructions = "1. Rulează șunca cu crema de brânză...\n2. Adaugă castraveți...";
-                    break;
-                case 4:
-                    ingredients = "Brânzeturi diverse, Struguri, Măsline";
-                    instructions = "1. Așază brânzeturile pe un platou...\n2. Adaugă struguri și măsline...";
-                    break;
-            }
-
-            // Adaugă datele în intent
-            intent.putExtra("recipeName", recipeName);
-            intent.putExtra("ingredients", ingredients);
-            intent.putExtra("instructions", instructions);
-            // Adaugă activitatea sursă în intent
-            intent.putExtra("sourceActivity", "AperitiveActivity");
-
-            // Pornește activitatea pentru detalii
+            intent.putExtra("recipeName", selectedRecipe.getName());
+            intent.putExtra("ingredients", selectedRecipe.getIngredients());
+            intent.putExtra("instructions", selectedRecipe.getInstructions());
             startActivity(intent);
         });
     }
@@ -98,10 +68,17 @@ public class AperitiveActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_CODE_ADD_RECIPE && resultCode == RESULT_OK && data != null) {
-            // Preia datele trimise de AddRecipeDetailsActivity
             String newRecipeName = data.getStringExtra("recipeName");
-            aperitiveList.add(newRecipeName); // Adaugă rețeta nouă în listă
-            adapter.notifyDataSetChanged(); // Actualizează ListView-ul
+            String newIngredients = data.getStringExtra("ingredients");
+            String newInstructions = data.getStringExtra("instructions");
+
+            // Creează un obiect Recipe pentru noua rețetă și adaugă-l în listă
+            Recipe newRecipe = new Recipe(newRecipeName, newIngredients, newInstructions);
+            aperitiveList.add(newRecipe);
+
+            // Actualizează lista afișată
+            adapter.add(newRecipe.getName());
+            adapter.notifyDataSetChanged();
         }
     }
 }
