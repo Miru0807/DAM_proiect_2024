@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
@@ -13,19 +14,21 @@ import java.util.ArrayList;
 public class AperitiveActivity extends AppCompatActivity {
     private ListView lvAperitive;
     private Button btnBackToMain;
+    private Button btnAddRecipe;
     private ArrayList<String> aperitiveList;
     private ArrayAdapter<String> adapter;
+
+    private static final int REQUEST_CODE_ADD_RECIPE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aperitive);
 
-        // Inițializarea elementelor UI
         lvAperitive = findViewById(R.id.lvAperitive);
         btnBackToMain = findViewById(R.id.btnBackToMain);
+        btnAddRecipe = findViewById(R.id.btnAddRecipe);
 
-        // Popularea ListView cu aperitive
         aperitiveList = new ArrayList<>();
         aperitiveList.add("Aperitiv 1 - Bruschette");
         aperitiveList.add("Aperitiv 2 - Ouă umplute");
@@ -36,14 +39,17 @@ public class AperitiveActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, aperitiveList);
         lvAperitive.setAdapter(adapter);
 
-        // Setează listener pentru butonul "Back"
         btnBackToMain.setOnClickListener(v -> {
             Intent intent = new Intent(AperitiveActivity.this, MainActivity.class);
             startActivity(intent);
-            finish(); // Opțional, pentru a închide activitatea curentă
+            finish();
         });
 
-        // Setează listener pentru elementele din ListView
+        btnAddRecipe.setOnClickListener(v -> {
+            Intent intent = new Intent(AperitiveActivity.this, AddRecipeDetailsActivity.class);
+            startActivityForResult(intent, REQUEST_CODE_ADD_RECIPE);
+        });
+
         lvAperitive.setOnItemClickListener((parent, view, position, id) -> {
             Intent intent = new Intent(AperitiveActivity.this, MainRecipeDetailsActivity.class);
 
@@ -85,5 +91,17 @@ public class AperitiveActivity extends AppCompatActivity {
             // Pornește activitatea pentru detalii
             startActivity(intent);
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_ADD_RECIPE && resultCode == RESULT_OK && data != null) {
+            // Preia datele trimise de AddRecipeDetailsActivity
+            String newRecipeName = data.getStringExtra("recipeName");
+            aperitiveList.add(newRecipeName); // Adaugă rețeta nouă în listă
+            adapter.notifyDataSetChanged(); // Actualizează ListView-ul
+        }
     }
 }

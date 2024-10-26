@@ -11,20 +11,18 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainRecipeDetailsActivity extends AppCompatActivity {
     private TextView tvRecipeName, tvIngredients, tvInstructions;
     private Button btnBackToMain;
-    private String sourceActivity; // Variabilă pentru a ține activitatea sursă
+    private String sourceActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_recipe_details);
 
-        // Inițializarea elementelor UI
         tvRecipeName = findViewById(R.id.tvRecipeName);
         tvIngredients = findViewById(R.id.tvIngredients);
         tvInstructions = findViewById(R.id.tvInstructions);
         btnBackToMain = findViewById(R.id.btnBackToMain);
 
-        // Obține datele trimise din activitatea anterioară
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String recipeName = extras.getString("recipeName");
@@ -36,7 +34,7 @@ public class MainRecipeDetailsActivity extends AppCompatActivity {
             tvIngredients.setText("Ingrediente: " + ingredients);
             tvInstructions.setText("Instrucțiuni: " + instructions);
 
-            // Setează listener pentru butonul "Back"
+
             btnBackToMain.setOnClickListener(v -> {
                 Intent intent;
                 // Verifică activitatea sursă și redirecționează în funcție de aceasta
