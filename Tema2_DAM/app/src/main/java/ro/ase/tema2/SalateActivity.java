@@ -10,12 +10,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
-
 public class SalateActivity extends AppCompatActivity {
     private ListView lvSalate;
     private Button btnBackToMain;
     private ArrayList<String> salateList;
-    private ArrayAdapter<String> adapter;
+    private SalateAdapter adapter; // Modificat aici pentru a folosi SalataAdapter
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +33,8 @@ public class SalateActivity extends AppCompatActivity {
         salateList.add("Salată 4 - Salată de cartofi");
         salateList.add("Salată 5 - Salată de varză");
 
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, salateList);
+        // Inițializare SalataAdapter cu cele trei reguli de formatare
+        adapter = new SalateAdapter(this, salateList);
         lvSalate.setAdapter(adapter);
 
         // Setează listener pentru butonul "Back"

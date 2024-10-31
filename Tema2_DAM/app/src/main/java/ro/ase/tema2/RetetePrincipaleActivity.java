@@ -28,11 +28,12 @@ public class RetetePrincipaleActivity extends AppCompatActivity {
 
         // Popularea ListView cu rețete
         recipesList = new ArrayList<>();
-        recipesList.add("Rețeta 1 - Friptură de pui");
-        recipesList.add("Rețeta 2 - Paste Carbonara");
-        recipesList.add("Rețeta 3 - Supă de legume");
-        recipesList.add("Rețeta 4 - Sarmale");
-        recipesList.add("Rețeta 5 - Tocăniță de cartofi");
+        recipesList.add("Friptură de pui");
+        recipesList.add("Paste Carbonara");
+        recipesList.add("Supă de legume");
+        recipesList.add("Sarmale");
+        recipesList.add("Tocăniță de cartofi");
+
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, recipesList);
         lvMainRecipes.setAdapter(adapter);

@@ -3,24 +3,29 @@ package ro.ase.tema2;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+
 public class MainRecipeDetailsActivity extends AppCompatActivity {
-    private TextView tvRecipeName, tvIngredients, tvInstructions;
+    private ListView lvRecipeDetails;
     private Button btnBackToMain;
     private String sourceActivity;
+    private ArrayList<String> recipeDetailsList;
+    private RecipeDetailsAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_recipe_details);
 
-        tvRecipeName = findViewById(R.id.tvRecipeName);
-        tvIngredients = findViewById(R.id.tvIngredients);
-        tvInstructions = findViewById(R.id.tvInstructions);
+        lvRecipeDetails = findViewById(R.id.lvRecipeDetails);
         btnBackToMain = findViewById(R.id.btnBackToMain);
+
+        // Populează lista de detalii ale rețetei
+        recipeDetailsList = new ArrayList<>();
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -29,17 +34,17 @@ public class MainRecipeDetailsActivity extends AppCompatActivity {
             String instructions = extras.getString("instructions");
             sourceActivity = extras.getString("sourceActivity");
 
-            tvRecipeName.setText(recipeName);
-            tvIngredients.setText("Ingrediente: " + ingredients);
-            tvInstructions.setText("Instrucțiuni: " + instructions);
+            // Adaugă detalii în lista pentru afișare
+            recipeDetailsList.add(recipeName);
+            recipeDetailsList.add(ingredients);
+            recipeDetailsList.add(instructions);
         }
 
-        btnBackToMain.setOnClickListener(v -> {
-            Intent intent = new Intent(MainRecipeDetailsActivity.this, AperitiveActivity.class);
-            startActivity(intent);
-            finish();
-        });
+        // Inițializează și setează adapterul pentru ListView
+        adapter = new RecipeDetailsAdapter(this, recipeDetailsList);
+        lvRecipeDetails.setAdapter(adapter);
 
+        // Setează listener pentru butonul "Back"
         btnBackToMain.setOnClickListener(v -> {
             Intent intent;
             // Verifică activitatea sursă și redirecționează în funcție de aceasta

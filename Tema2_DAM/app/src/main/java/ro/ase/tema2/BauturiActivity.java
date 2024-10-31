@@ -2,7 +2,6 @@ package ro.ase.tema2;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -16,7 +15,7 @@ public class BauturiActivity extends AppCompatActivity {
     private Button btnBackToMain;
     private Button btnAddRecipe;
     private ArrayList<Recipe> bauturiList;
-    private ArrayAdapter<String> adapter;
+    private RecipeAdapter adapter;
 
     private static final int REQUEST_CODE_ADD_RECIPE = 1;
 
@@ -27,18 +26,14 @@ public class BauturiActivity extends AppCompatActivity {
 
         lvBauturi = findViewById(R.id.lvBauturi);
         btnBackToMain = findViewById(R.id.btnBackToMain);
-        btnAddRecipe = findViewById(R.id.btnAddRecipe); // Inițializare buton de adăugare
+        btnAddRecipe = findViewById(R.id.btnAddRecipe);
 
         bauturiList = new ArrayList<>();
-        bauturiList.add(new Recipe("Băutură 1 - Limonadă", "Lămâi, Apă, Zahăr, Mentă", "1. Stoarce lămâile...\n2. Amestecă apa cu zahărul și menta..."));
-        bauturiList.add(new Recipe("Băutură 2 - Smoothie cu banane", "Banane, Lapte, Miere", "1. Amestecă bananele cu laptele...\n2. Adaugă mierea..."));
+        bauturiList.add(new Recipe("Limonadă", "Lămâi, Apă, Zahăr, Mentă", "1. Stoarce lămâile...\n2. Amestecă apa cu zahărul și menta..."));
+        bauturiList.add(new Recipe("Smoothie cu banane", "Banane, Lapte, Miere", "1. Amestecă bananele cu laptele...\n2. Adaugă mierea..."));
 
-        ArrayList<String> recipeNames = new ArrayList<>();
-        for (Recipe recipe : bauturiList) {
-            recipeNames.add(recipe.getName());
-        }
-
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, recipeNames);
+        // Inițializează adapterul custom și setează la ListView
+        adapter = new RecipeAdapter(this, bauturiList);
         lvBauturi.setAdapter(adapter);
 
         btnBackToMain.setOnClickListener(v -> {
@@ -73,13 +68,9 @@ public class BauturiActivity extends AppCompatActivity {
             String newIngredients = data.getStringExtra("ingredients");
             String newInstructions = data.getStringExtra("instructions");
 
-            // Creează și adaugă rețeta nouă în listă
+            // Creează și adaugă rețeta nouă în adapter
             Recipe newRecipe = new Recipe(newRecipeName, newIngredients, newInstructions);
-            bauturiList.add(newRecipe);
-
-            // Actualizează lista afișată în `ListView`
-            adapter.add(newRecipe.getName());
-            adapter.notifyDataSetChanged();
+            adapter.addRecipe(newRecipe); // Metodă custom din adapter care sortează și notifică
         }
     }
 }
