@@ -22,6 +22,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/btnBackToMain" />
 
+    <!-- Buton pentru adăugarea unei rețete noi -->
+    <Button
+        android:id="@+id/btnAddRecipe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Recipe"
+        app:layout_constraintBottom_toTopOf="@id/btnBackToMain"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5" />
+
     <!-- Buton pentru revenirea la pagina principală -->
     <Button
         android:id="@+id/btnBackToMain"
