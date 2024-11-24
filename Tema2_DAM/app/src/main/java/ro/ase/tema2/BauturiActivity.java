@@ -7,8 +7,10 @@ import android.widget.ListView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BauturiActivity extends AppCompatActivity {
     private ListView lvBauturi;
@@ -19,8 +21,12 @@ public class BauturiActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_ADD_RECIPE = 1;
 
+    AppDatabase db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        db = AppDatabase.getInstance(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bauturi);
 
@@ -28,9 +34,7 @@ public class BauturiActivity extends AppCompatActivity {
         btnBackToMain = findViewById(R.id.btnBackToMain);
         btnAddRecipe = findViewById(R.id.btnAddRecipe);
 
-        bauturiList = new ArrayList<>();
-        bauturiList.add(new Recipe("Limonadă", "Lămâi, Apă, Zahăr, Mentă", "1. Stoarce lămâile...\n2. Amestecă apa cu zahărul și menta..."));
-        bauturiList.add(new Recipe("Smoothie cu banane", "Banane, Lapte, Miere", "1. Amestecă bananele cu laptele...\n2. Adaugă mierea..."));
+        bauturiList = (ArrayList<Recipe>) db.recipeDao().getAllByCategory(1);
 
         // Inițializează adapterul custom și setează la ListView
         adapter = new RecipeAdapter(this, bauturiList);
@@ -42,13 +46,11 @@ public class BauturiActivity extends AppCompatActivity {
             finish();
         });
 
-        // Deschide `AddRecipeDetailsActivity` pentru a adăuga o băutură nouă
         btnAddRecipe.setOnClickListener(v -> {
             Intent intent = new Intent(BauturiActivity.this, AddRecipeDetailsActivity.class);
             startActivityForResult(intent, REQUEST_CODE_ADD_RECIPE);
         });
 
-        // Deschide `MainRecipeDetailsActivity` pentru detaliile rețetei selectate
         lvBauturi.setOnItemClickListener((parent, view, position, id) -> {
             Recipe selectedRecipe = bauturiList.get(position);
             Intent intent = new Intent(BauturiActivity.this, MainRecipeDetailsActivity.class);
@@ -61,15 +63,21 @@ public class BauturiActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        RecipeDao recipeDao = db.recipeDao();
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_CODE_ADD_RECIPE && resultCode == RESULT_OK && data != null) {
             String newRecipeName = data.getStringExtra("recipeName");
             String newIngredients = data.getStringExtra("ingredients");
             String newInstructions = data.getStringExtra("instructions");
+            int newCategory = 1;
 
+            if (db.categoryDao().getCategoryById(newCategory) == null) {
+                db.categoryDao().insertCategory(new Category("Băuturi")); // Adaugă categoria dacă nu există
+            }
             // Creează și adaugă rețeta nouă în adapter
-            Recipe newRecipe = new Recipe(newRecipeName, newIngredients, newInstructions);
+            Recipe newRecipe = new Recipe(newRecipeName, newIngredients, newInstructions, newCategory);
+            recipeDao.insertAll(newRecipe);
             adapter.addRecipe(newRecipe); // Metodă custom din adapter care sortează și notifică
         }
     }
